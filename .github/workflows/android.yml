@@ -1,0 +1,76 @@
+name: Build SHOKH IT APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Create Capacitor project
+        run: |
+          cat > package.json <<'EOF'
+          {
+            "name": "shokh-it",
+            "version": "1.0.0",
+            "private": true,
+            "scripts": {
+              "build": "echo build"
+            }
+          }
+          EOF
+
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+          mkdir -p www
+          cp index.html www/
+          cp config.js www/
+          cp manifest.json www/
+          cp sw.js www/
+          
+          cp -f *.png www/ 2>/dev/null || true
+          cp -f *.svg www/ 2>/dev/null || true
+
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.shokhit.app",
+            "appName": "SHOKH IT",
+            "webDir": "www",
+            "server": {
+              "androidScheme": "https"
+            }
+          }
+          EOF
+
+          npx cap add android
+          npx cap sync android
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SHOKH-IT-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
