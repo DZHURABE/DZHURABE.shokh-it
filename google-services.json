@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1043196177906",
+    "project_id": "shokh-it",
+    "storage_bucket": "shokh-it.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1043196177906:android:92a18cd7cffb7e5e71cf6b",
+        "android_client_info": {
+          "package_name": "com.shokhit.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCh_WxOQtbDGmW26p0K7XtgeZFgdb7FnVA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
