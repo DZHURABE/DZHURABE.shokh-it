@@ -1,10 +1,10 @@
 name: Build SHOKH IT APK
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-apk:
@@ -19,55 +19,25 @@ jobs:
         with:
           node-version: 20
 
-      - name: Create Capacitor project
-        run: |
-          cat > package.json <<'EOF'
-          {
-            "name": "shokh-it",
-            "version": "1.0.0",
-            "private": true,
-            "scripts": {
-              "build": "echo build"
-            }
-          }
-          EOF
-
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-
-          mkdir -p www
-          cp index.html www/
-          cp config.js www/
-          cp manifest.json www/
-          cp sw.js www/
-          
-          cp -f *.png www/ 2>/dev/null || true
-          cp -f *.svg www/ 2>/dev/null || true
-
-          cat > capacitor.config.json <<'EOF'
-          {
-            "appId": "com.shokhit.app",
-            "appName": "SHOKH IT",
-            "webDir": "www",
-            "server": {
-              "androidScheme": "https"
-            }
-          }
-          EOF
-
-          npx cap add android
-          npx cap sync android
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '21'
+          cache: gradle
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web
+        run: npm run build
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
 
       - name: Build APK
         working-directory: android
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+        run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
